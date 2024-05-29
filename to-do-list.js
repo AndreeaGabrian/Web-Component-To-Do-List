@@ -6,33 +6,54 @@ class ToDoList extends HTMLElement {
             <link rel="stylesheet" href="styles.css">
             <div class="todo-box">
                 <div class="todo-container">
+                    <div class="todo-title">To-Do List</div>
                     <div class="toolbar">
                         <button id="boldBtn">Bold</button>
                         <button id="italicBtn">Italic</button>
-                        <input type="color" id="colorPicker" class="color-picker">
-                        <button id="addBtn">Add</button>
+                        <label for="colorPicker">Text Color:</label>
+                            <input type="color" id="colorPicker" class="color-picker">
+                        <button id="addBtn" class="add-btn">Add</button>
                     </div>
-                    <div contenteditable="true" class="todo-input" id="todoInput"></div>
+                    <div contenteditable="true" class="todo-input" id="todoInput">Type</div>
                     <ul class="todo-list" id="todoList"></ul>
                 </div>
             </div>
         `;
 
         this.todoInput = this.shadowRoot.getElementById('todoInput');
+        this.todoInput.addEventListener('click', () => this.clearPlaceholder());
         this.todoList = this.shadowRoot.getElementById('todoList');
         this.boldBtn = this.shadowRoot.getElementById('boldBtn');
         this.italicBtn = this.shadowRoot.getElementById('italicBtn');
         this.colorPicker = this.shadowRoot.getElementById('colorPicker');
         this.addBtn = this.shadowRoot.getElementById('addBtn');
 
-        this.boldBtn.addEventListener('click', () => this.formatText('bold'));
-        this.italicBtn.addEventListener('click', () => this.formatText('italic'));
+        this.boldBtn.addEventListener('click', () => this.toggleFormat('bold'));
+        this.italicBtn.addEventListener('click', () => this.toggleFormat('italic'));
         this.colorPicker.addEventListener('input', (e) => this.changeTextColor(e.target.value));
         this.addBtn.addEventListener('click', () => this.addTodoItem());
     }
 
-    formatText(command) {
+    clearPlaceholder() {
+        if (this.todoInput.textContent.trim() === 'Type') {
+            this.todoInput.textContent = '';
+        }
+    }
+
+
+    toggleFormat(command) {
         document.execCommand(command, false, null);
+        this.updateButtonState(command);
+    }
+
+    updateButtonState(command) {
+        const active = document.queryCommandState(command);
+        const button = command === 'bold' ? this.boldBtn : this.italicBtn;
+        if (active) {
+            button.classList.add('active');
+        } else {
+            button.classList.remove('active');
+        }
     }
 
     changeTextColor(color) {

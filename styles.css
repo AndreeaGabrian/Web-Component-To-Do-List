@@ -2,7 +2,7 @@
     display: block;
     max-width: 600px;
     margin: 20px auto;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Monaco', monospace;
 }
 
 .todo-box {
@@ -28,7 +28,7 @@
 
 button {
     border: none;
-    background: #6200ea;
+    background: #9dc0b9;
     color: white;
     padding: 8px 12px;
     border-radius: 4px;
@@ -38,7 +38,13 @@ button {
 }
 
 button:hover {
-    background: #3700b3;
+    background: #457e72;
+}
+button.active {
+    background-color: #457e72;
+}
+.todo-title{
+    padding-bottom: 8px
 }
 
 .color-picker {
@@ -61,7 +67,7 @@ button:hover {
 }
 
 .todo-input:focus {
-    border-color: #6200ea;
+    border-color: #457e72;
     box-shadow: 0 0 4px rgba(98, 0, 234, 0.4);
 }
 
@@ -89,9 +95,17 @@ button:hover {
 }
 
 .delete-btn {
-    background: #e91e63;
+    background: #ee6191;
 }
 
 .delete-btn:hover {
     background: #c2185b;
+}
+
+.add-btn {
+    background-color: #c28ff1; /* Change to your preferred color */
+    color: white;
+}
+.add-btn:hover {
+    background: #622996;
 }
