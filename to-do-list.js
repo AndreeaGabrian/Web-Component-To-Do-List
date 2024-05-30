@@ -11,8 +11,9 @@ class ToDoList extends HTMLElement {
                         <button class="textBtn" id="boldBtn">Bold</button>
                         <button class="textBtn" id="italicBtn">Italic</button>
                         <label for="colorPicker">Text Color:</label>
-                            <input type="color" id="colorPicker" class="color-picker">
+                        <input type="color" id="colorPicker" class="color-picker">
                         <button id="addBtn" class="add-btn">Add</button>
+                        <button id="clearAllBtn" class="clear-all-btn">Clear All</button>
                     </div>
                     <div contenteditable="true" class="todo-input" id="todoInput">Type</div>
                     <ul class="todo-list" id="todoList"></ul>
@@ -27,11 +28,20 @@ class ToDoList extends HTMLElement {
         this.italicBtn = this.shadowRoot.getElementById('italicBtn');
         this.colorPicker = this.shadowRoot.getElementById('colorPicker');
         this.addBtn = this.shadowRoot.getElementById('addBtn');
+        this.clearAllBtn = this.shadowRoot.getElementById('clearAllBtn');
 
         this.boldBtn.addEventListener('click', () => this.toggleFormat('bold'));
         this.italicBtn.addEventListener('click', () => this.toggleFormat('italic'));
         this.colorPicker.addEventListener('input', (e) => this.changeTextColor(e.target.value));
         this.addBtn.addEventListener('click', () => this.addTodoItem());
+        this.clearAllBtn.addEventListener('click', () => this.clearAllTodos());
+
+        this.draggedItem = null;
+        this.todoList.addEventListener('dragstart', (e) => this.dragStart(e));
+        this.todoList.addEventListener('dragover', (e) => this.dragOver(e));
+        this.todoList.addEventListener('drop', (e) => this.drop(e));
+
+        this.loadTodos();
     }
 
     clearPlaceholder() {
@@ -62,41 +72,139 @@ class ToDoList extends HTMLElement {
     addTodoItem() {
         const text = this.todoInput.innerHTML.trim();
         if (text) {
-            const li = document.createElement('li');
-            li.classList.add('todo-item');
-            li.innerHTML = `
-                <span>${text}</span>
-                <button class="delete-btn" hidden><i>delete</i></button>
-            `;
-            li.addEventListener('click', (e) => this.toggleDeleteButton(e, li));
-            this.todoList.appendChild(li);
-            this.todoInput.innerHTML = '';
+            const todo = { text: text, dueDate: 'No due date', priority: 'Priority: High' };
+            this.addTodoFromStorage(todo);
+            this.saveTodos();
         }
     }
 
-    toggleDeleteButton(event, listItem) {
-        event.stopPropagation(); // Prevent the click event from bubbling up
-        const deleteButton = listItem.querySelector('.delete-btn');
-        const isVisible = !deleteButton.hidden;
-        deleteButton.hidden = isVisible;
+    addTodoFromStorage(todo) {
+        const li = document.createElement('li');
+        li.classList.add('todo-item');
+        if (todo.completed) {
+            li.classList.add('completed');
+        }
+        li.draggable = true;
+        console.log(todo.dueDate);
+        li.innerHTML = `
+            <span class="display-text-item">${todo.text}</span>
+            <span class="display-due-date">${ todo.dueDate === 'Due:' ? 'No due date' : todo.dueDate}</span>
+            <span class="display-priority">${todo.priority}</span>
+            <input type="date" class="due-date" value="${todo.dueDate}" hidden>
+            <select class="priority" hidden>
+                <option value="High" ${todo.priority === 'High' ? 'selected' : ''}>High</option>
+                <option value="Medium" ${todo.priority === 'Medium' ? 'selected' : ''}>Medium</option>
+                <option value="Low" ${todo.priority === 'Low' ? 'selected' : ''}>Low</option>
+            </select>
+            <button class="mark-completed-btn" hidden><i>Mark as completed</i></button>
+            <button class="delete-btn" hidden><i>Delete</i></button>
+        `;
+        li.addEventListener('click', (e) => this.toggleButtons(e, li));
+        li.querySelector('.mark-completed-btn').addEventListener('click', () => this.markAsCompleted(li));
+        li.querySelector('.delete-btn').addEventListener('click', () => {
+            li.remove();
+            this.saveTodos();
+        });
+        li.querySelector('.due-date').addEventListener('change', () => this.updateDueDate(li));
+        li.querySelector('.priority').addEventListener('change', () => this.updatePriority(li));
+        this.todoList.appendChild(li);
+        this.todoInput.innerHTML = '';
+    }
 
-        // Hide other delete buttons and remove focused class if any
+    updateDueDate(listItem) {
+        const dueDateSpan = listItem.querySelector('.display-due-date');
+        const dueDateInput = listItem.querySelector('.due-date');
+        dueDateSpan.textContent = 'Due:' + dueDateInput.value || 'No due date';
+        this.saveTodos();
+    }
+
+    updatePriority(listItem) {
+        const prioritySpan = listItem.querySelector('.display-priority');
+        const prioritySelect = listItem.querySelector('.priority');
+        prioritySpan.textContent = 'Priority: ' + prioritySelect.value;
+        this.saveTodos();
+    }
+
+    toggleButtons(event, listItem) {
+        event.stopPropagation(); // Prevent the click event from bubbling up
+        const markCompletedButton = listItem.querySelector('.mark-completed-btn');
+        const deleteButton = listItem.querySelector('.delete-btn');
+        const dueDateInput = listItem.querySelector('.due-date');
+        const prioritySelect = listItem.querySelector('.priority');
+        const dueDateSpan = listItem.querySelector('.display-due-date');
+        const prioritySpan = listItem.querySelector('.display-priority');
+        const isVisible = !deleteButton.hidden;
+
+        markCompletedButton.hidden = deleteButton.hidden = dueDateInput.hidden = prioritySelect.hidden = isVisible;
+        dueDateSpan.hidden = prioritySpan.hidden = !isVisible;
+
+        // Hide other buttons and remove focused class if any
         this.todoList.querySelectorAll('.todo-item').forEach(item => {
             if (item !== listItem) {
+                item.querySelector('.mark-completed-btn').hidden = true;
                 item.querySelector('.delete-btn').hidden = true;
+                item.querySelector('.due-date').hidden = true;
+                item.querySelector('.priority').hidden = true;
+                item.querySelector('.display-priority').hidden = false;
+                item.querySelector('.display-due-date').hidden = false;
                 item.classList.remove('focused');
             }
         });
 
         // Toggle the focused class
         listItem.classList.toggle('focused', !isVisible);
+    }
 
-        // Attach the event listener to the delete button to remove the item
-        if (!isVisible) {
-            deleteButton.addEventListener('click', () => listItem.remove());
+    dragStart(event) {
+        this.draggedItem = event.target;
+        event.dataTransfer.effectAllowed = 'move';
+    }
+
+    dragOver(event) {
+        event.preventDefault();
+    }
+
+    drop(event) {
+        event.preventDefault();
+        if (this.draggedItem && event.target.tagName === 'LI') {
+            this.todoList.insertBefore(this.draggedItem, event.target.nextSibling);
+            this.draggedItem = null;
+            this.saveTodos();
         }
+    }
+
+    saveTodos() {
+        const todos = [];
+        this.todoList.querySelectorAll('.todo-item').forEach(item => {
+            todos.push({
+                text: item.querySelector('.display-text-item').textContent,
+                dueDate: item.querySelector('.display-due-date').textContent,
+                priority: item.querySelector('.display-priority').textContent,
+                completed: item.classList.contains('completed')
+            });
+        });
+        localStorage.setItem('todos', JSON.stringify(todos));
+    }
+
+    loadTodos() {
+        const todos = JSON.parse(localStorage.getItem('todos') || '[]');
+        todos.forEach(todo => this.addTodoFromStorage(todo));
+    }
+
+    clearAllTodos() {
+        while (this.todoList.firstChild) {
+            this.todoList.removeChild(this.todoList.firstChild);
+        }
+        localStorage.removeItem('todos');
+    }
+
+    markAsCompleted(listItem) {
+        listItem.querySelector('.display-text-item').classList.add('completed');
+        this.saveTodos();
     }
 }
 
 customElements.define('to-do-list', ToDoList);
+
+
 

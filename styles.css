@@ -85,6 +85,8 @@
     align-items: center;
     padding: 8px 0;
     border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .todo-item.focused {
@@ -113,6 +115,19 @@
     color: #c2185b;
 }
 
+.mark-completed-btn{
+    background: none;
+    border: none;
+    color: #ee6191;
+    cursor: pointer;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.mark-completed-btn:hover{
+    color: #c2185b;
+}
+
 .add-btn {
     background-color: #c28ff1; /* Change to your preferred color */
     color: white;
@@ -126,4 +141,52 @@
 
 .add-btn:hover {
     background: #622996;
+}
+
+.due-date, .priority {
+    margin-left: 10px;
+}
+
+.edit-btn {
+    background: none;
+    border: none;
+    color: #457e72;
+    cursor: pointer;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+.edit-btn:hover {
+    color: #004d40;
+}
+
+.display-due-date{
+    margin-left:10%;
+    font-size: 14px;
+    color: #919994;
+}
+
+.display-priority{
+    font-size: 14px;
+    color: #919994;
+}
+
+.clear-all-btn {
+    background-color: #c28ff1;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.clear-all-btn:hover {
+    background: #622996;
+}
+
+.completed {
+    color: grey;
+    text-decoration: line-through;
 }
