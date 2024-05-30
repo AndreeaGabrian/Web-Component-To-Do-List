@@ -26,7 +26,7 @@
     margin-bottom: 10px;
 }
 
-button {
+.textBtn {
     border: none;
     background: #9dc0b9;
     color: white;
@@ -37,14 +37,16 @@ button {
     transition: background 0.3s;
 }
 
-button:hover {
+.textBtn:hover {
     background: #457e72;
 }
-button.active {
+
+.textBtn.active {
     background-color: #457e72;
 }
-.todo-title{
-    padding-bottom: 8px
+
+.todo-title {
+    padding-bottom: 8px;
 }
 
 .color-picker {
@@ -85,6 +87,10 @@ button.active {
     border-bottom: 1px solid #e0e0e0;
 }
 
+.todo-item.focused {
+    background-color: #f8f8f8;
+}
+
 .todo-item:last-child {
     border-bottom: none;
 }
@@ -95,17 +101,29 @@ button.active {
 }
 
 .delete-btn {
-    background: #ee6191;
+    background: none;
+    border: none;
+    color: #ee6191;
+    cursor: pointer;
+    font-size: 16px;
+    transition: color 0.3s;
 }
 
 .delete-btn:hover {
-    background: #c2185b;
+    color: #c2185b;
 }
 
 .add-btn {
     background-color: #c28ff1; /* Change to your preferred color */
     color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
 }
+
 .add-btn:hover {
     background: #622996;
 }

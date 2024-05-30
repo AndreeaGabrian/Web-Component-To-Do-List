@@ -8,8 +8,8 @@ class ToDoList extends HTMLElement {
                 <div class="todo-container">
                     <div class="todo-title">To-Do List</div>
                     <div class="toolbar">
-                        <button id="boldBtn">Bold</button>
-                        <button id="italicBtn">Italic</button>
+                        <button class="textBtn" id="boldBtn">Bold</button>
+                        <button class="textBtn" id="italicBtn">Italic</button>
                         <label for="colorPicker">Text Color:</label>
                             <input type="color" id="colorPicker" class="color-picker">
                         <button id="addBtn" class="add-btn">Add</button>
@@ -40,7 +40,6 @@ class ToDoList extends HTMLElement {
         }
     }
 
-
     toggleFormat(command) {
         document.execCommand(command, false, null);
         this.updateButtonState(command);
@@ -67,13 +66,37 @@ class ToDoList extends HTMLElement {
             li.classList.add('todo-item');
             li.innerHTML = `
                 <span>${text}</span>
-                <button class="delete-btn">Delete</button>
+                <button class="delete-btn" hidden><i>delete</i></button>
             `;
-            li.querySelector('.delete-btn').addEventListener('click', () => li.remove());
+            li.addEventListener('click', (e) => this.toggleDeleteButton(e, li));
             this.todoList.appendChild(li);
             this.todoInput.innerHTML = '';
+        }
+    }
+
+    toggleDeleteButton(event, listItem) {
+        event.stopPropagation(); // Prevent the click event from bubbling up
+        const deleteButton = listItem.querySelector('.delete-btn');
+        const isVisible = !deleteButton.hidden;
+        deleteButton.hidden = isVisible;
+
+        // Hide other delete buttons and remove focused class if any
+        this.todoList.querySelectorAll('.todo-item').forEach(item => {
+            if (item !== listItem) {
+                item.querySelector('.delete-btn').hidden = true;
+                item.classList.remove('focused');
+            }
+        });
+
+        // Toggle the focused class
+        listItem.classList.toggle('focused', !isVisible);
+
+        // Attach the event listener to the delete button to remove the item
+        if (!isVisible) {
+            deleteButton.addEventListener('click', () => listItem.remove());
         }
     }
 }
 
 customElements.define('to-do-list', ToDoList);
+
