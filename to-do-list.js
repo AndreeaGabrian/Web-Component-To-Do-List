@@ -14,6 +14,7 @@ class ToDoList extends HTMLElement {
                         <input type="color" id="colorPicker" class="color-picker">
                         <button id="addBtn" class="add-btn">Add</button>
                         <button id="clearAllBtn" class="clear-all-btn">Clear All</button>
+                        <button id="savePdfBtn" class="save-pdf-btn">Save as PDF</button>
                     </div>
                     <div contenteditable="true" class="todo-input" id="todoInput">Type</div>
                     <ul class="todo-list" id="todoList"></ul>
@@ -29,12 +30,14 @@ class ToDoList extends HTMLElement {
         this.colorPicker = this.shadowRoot.getElementById('colorPicker');
         this.addBtn = this.shadowRoot.getElementById('addBtn');
         this.clearAllBtn = this.shadowRoot.getElementById('clearAllBtn');
+        this.savePdfBtn = this.shadowRoot.getElementById('savePdfBtn');
 
         this.boldBtn.addEventListener('click', () => this.toggleFormat('bold'));
         this.italicBtn.addEventListener('click', () => this.toggleFormat('italic'));
         this.colorPicker.addEventListener('input', (e) => this.changeTextColor(e.target.value));
         this.addBtn.addEventListener('click', () => this.addTodoItem());
         this.clearAllBtn.addEventListener('click', () => this.clearAllTodos());
+        this.savePdfBtn.addEventListener('click', () => this.saveAsPdf());
 
         this.draggedItem = null;
         this.todoList.addEventListener('dragstart', (e) => this.dragStart(e));
@@ -210,6 +213,36 @@ class ToDoList extends HTMLElement {
         }
         this.saveTodos();
     }
+
+    saveAsPdf() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        doc.setFontSize(16);
+        doc.text('To-Do List', 10, 10);
+
+        // Add each to-do item to the PDF
+        const items = this.todoList.querySelectorAll('.todo-item');
+        let yPosition = 20;
+        items.forEach((item, index) => {
+            const text = item.querySelector('span').textContent;
+            const dueDate = item.querySelector('.display-due-date').textContent;
+            const priority = item.querySelector('.display-priority').textContent;
+            const completed = item.querySelector('.display-text-item').classList.contains('completed') ? ' (Completed)' : ' (Incomplete)';
+
+            doc.setFontSize(12);
+            doc.text(`${index + 1}. ${text}${completed}`, 10, yPosition);
+            doc.setFontSize(10);
+            doc.text(`${dueDate}`, 10, yPosition + 5);
+            doc.text(`${priority}`, 10, yPosition + 10);
+
+            yPosition += 20; // Move down for the next item
+        });
+
+        // Save the PDF
+        doc.save('todo-list.pdf');
+    }
+
 }
 
 customElements.define('to-do-list', ToDoList);
