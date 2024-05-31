@@ -110,8 +110,18 @@ class ToDoList extends HTMLElement {
             li.remove();
             this.saveTodos();
         });
-        li.querySelector('.due-date').addEventListener('change', () => this.updateDueDate(li));
-        li.querySelector('.priority').addEventListener('change', () => this.updatePriority(li));
+        // Stop event propagation for the due date input, complete button and priority select
+        const dueDateInput = li.querySelector('.due-date');
+        const prioritySelect = li.querySelector('.priority');
+        li.querySelector('.mark-completed-btn').addEventListener('click', (e) => e.stopPropagation());
+        dueDateInput.addEventListener('click', (e) => e.stopPropagation());
+        prioritySelect.addEventListener('click', (e) => e.stopPropagation());
+
+        dueDateInput.addEventListener('change', () => this.updateDueDate(li));
+        prioritySelect.addEventListener('change', () => this.updatePriority(li));
+
+        // li.querySelector('.due-date').addEventListener('change', () => this.updateDueDate(li));
+        // li.querySelector('.priority').addEventListener('change', () => this.updatePriority(li));
         this.todoList.appendChild(li);
         this.todoInput.innerHTML = '';
     }
