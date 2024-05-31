@@ -107,7 +107,7 @@
     border: none;
     color: #ee6191;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
     transition: color 0.3s;
 }
 
@@ -122,6 +122,7 @@
     cursor: pointer;
     font-size: 14px;
     transition: color 0.3s;
+    font-style: italic;
 }
 
 .mark-completed-btn:hover{

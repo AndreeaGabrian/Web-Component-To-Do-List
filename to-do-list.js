@@ -81,9 +81,6 @@ class ToDoList extends HTMLElement {
     addTodoFromStorage(todo) {
         const li = document.createElement('li');
         li.classList.add('todo-item');
-        if (todo.completed) {
-            li.classList.add('completed');
-        }
         li.draggable = true;
         console.log(todo.dueDate);
         li.innerHTML = `
@@ -99,6 +96,10 @@ class ToDoList extends HTMLElement {
             <button class="mark-completed-btn" hidden><i>Mark as completed</i></button>
             <button class="delete-btn" hidden><i>Delete</i></button>
         `;
+        if (todo.completed) {
+            li.querySelector('.display-text-item').classList.add('completed');
+            li.querySelector('.mark-completed-btn').textContent = "Mark as incomplete";
+        }
         li.addEventListener('click', (e) => this.toggleButtons(e, li));
         li.querySelector('.mark-completed-btn').addEventListener('click', () => this.markAsCompleted(li));
         li.querySelector('.delete-btn').addEventListener('click', () => {
@@ -180,7 +181,7 @@ class ToDoList extends HTMLElement {
                 text: item.querySelector('.display-text-item').textContent,
                 dueDate: item.querySelector('.display-due-date').textContent,
                 priority: item.querySelector('.display-priority').textContent,
-                completed: item.classList.contains('completed')
+                completed: item.querySelector('.display-text-item').classList.contains('completed')
             });
         });
         localStorage.setItem('todos', JSON.stringify(todos));
@@ -199,7 +200,14 @@ class ToDoList extends HTMLElement {
     }
 
     markAsCompleted(listItem) {
-        listItem.querySelector('.display-text-item').classList.add('completed');
+        const markCompletedButton = listItem.querySelector('.mark-completed-btn');
+        listItem.querySelector('.display-text-item').classList.toggle('completed');
+        markCompletedButton.textContent = listItem.querySelector('.display-text-item').classList.contains('completed') ? 'Mark as incomplete' : 'Mark as completed';
+        if(markCompletedButton.textContent === 'Mark as incomplete'){
+            listItem.querySelector('.display-text-item').classList.add('completed');
+        }else{
+            listItem.querySelector('.display-text-item').classList.remove('completed');
+        }
         this.saveTodos();
     }
 }
