@@ -1,8 +1,19 @@
 class ToDoList extends HTMLElement {
+    static observedAttributes = ['size'];
+
     constructor() {
         super();
+        this.size = { width: '300px', height: '200px' }; // Default size
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.innerHTML = `
+         <style>
+                /* Add styles to customize the size of the component */
+                :host {
+                    display: inline-block;
+                    width: ${this.size.width};
+                    height: ${this.size.height};
+                }
+            </style>
             <link rel="stylesheet" href="ToDoComponent/styles.css">
             <div class="todo-box">
                 <div class="todo-container">
@@ -46,6 +57,21 @@ class ToDoList extends HTMLElement {
 
         this.loadTodos();
         this.color = 'black';
+    }
+
+    // Called when an observed attribute is set or changed
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (name === 'size') {
+            const [width, height] = newValue.split(',');
+            this.size = { width: width.trim(), height: height.trim() };
+            this.updateSize();
+        }
+    }
+
+    // Update the size of the component
+    updateSize() {
+        this.style.width = this.size.width;
+        this.style.height = this.size.height;
     }
 
     clearPlaceholder() {
