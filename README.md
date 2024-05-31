@@ -1,6 +1,6 @@
 # Web-Component-To-Do-List
 A custom web component for the Framework Design Course written in JavaScript
-
+![Example](img.png)
 # ToDoList Web Component
 
 The ToDoList web component is a customizable to-do list that can be easily integrated into web applications. It provides features like adding, deleting, and marking tasks as completed, as well as saving the list as a PDF. The list with all the features is below.
