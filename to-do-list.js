@@ -231,10 +231,13 @@ class ToDoList extends HTMLElement {
             const dueDate = item.querySelector('.display-due-date').textContent;
             const priority = item.querySelector('.display-priority').textContent;
             const completed = item.querySelector('.display-text-item').classList.contains('completed') ? ' (Completed)' : ' (Incomplete)';
+            const color = item.querySelector('.display-text-item').getAttribute('data-color');
 
             doc.setFontSize(12);
+            doc.setTextColor(color);
             doc.text(`${index + 1}. ${text}${completed}`, 10, yPosition);
             doc.setFontSize(10);
+            doc.setTextColor('#000000');
             doc.text(`${dueDate}`, 10, yPosition + 5);
             doc.text(`${priority}`, 10, yPosition + 10);
 
