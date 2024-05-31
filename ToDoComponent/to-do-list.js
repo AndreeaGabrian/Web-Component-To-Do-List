@@ -3,7 +3,7 @@ class ToDoList extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.innerHTML = `
-            <link rel="stylesheet" href="styles.css">
+            <link rel="stylesheet" href="ToDoComponent/styles.css">
             <div class="todo-box">
                 <div class="todo-container">
                     <div class="todo-title">To-Do List</div>
