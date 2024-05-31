@@ -14,7 +14,7 @@ class ToDoList extends HTMLElement {
                         <input type="color" id="colorPicker" class="color-picker">
                         <button id="addBtn" class="add-btn">Add</button>
                         <button id="clearAllBtn" class="clear-all-btn">Clear All</button>
-                        <button id="savePdfBtn" class="save-pdf-btn">Save as PDF</button>
+                        <button id="savePdfBtn" class="clear-all-btn">Save as PDF</button>
                     </div>
                     <div contenteditable="true" class="todo-input" id="todoInput">Type</div>
                     <ul class="todo-list" id="todoList"></ul>
