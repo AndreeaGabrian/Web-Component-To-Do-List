@@ -45,6 +45,7 @@ class ToDoList extends HTMLElement {
         this.todoList.addEventListener('drop', (e) => this.drop(e));
 
         this.loadTodos();
+        this.color = 'black';
     }
 
     clearPlaceholder() {
@@ -70,12 +71,13 @@ class ToDoList extends HTMLElement {
 
     changeTextColor(color) {
         document.execCommand('foreColor', false, color);
+        this.color = color;
     }
 
     addTodoItem() {
         const text = this.todoInput.innerHTML.trim();
         if (text) {
-            const todo = { text: text, dueDate: 'No due date', priority: 'Priority: High' };
+            const todo = { text: text, dueDate: 'No due date', priority: 'Priority: High', color:this.color};
             this.addTodoFromStorage(todo);
             this.saveTodos();
         }
@@ -85,9 +87,8 @@ class ToDoList extends HTMLElement {
         const li = document.createElement('li');
         li.classList.add('todo-item');
         li.draggable = true;
-        console.log(todo.dueDate);
         li.innerHTML = `
-            <span class="display-text-item">${todo.text}</span>
+            <span class="display-text-item" data-color=${todo.color} style="color:${todo.color};">${todo.text}</span>
             <span class="display-due-date">${ todo.dueDate === 'Due:' ? 'No due date' : todo.dueDate}</span>
             <span class="display-priority">${todo.priority}</span>
             <input type="date" class="due-date" value="${todo.dueDate}" hidden>
@@ -184,7 +185,8 @@ class ToDoList extends HTMLElement {
                 text: item.querySelector('.display-text-item').textContent,
                 dueDate: item.querySelector('.display-due-date').textContent,
                 priority: item.querySelector('.display-priority').textContent,
-                completed: item.querySelector('.display-text-item').classList.contains('completed')
+                completed: item.querySelector('.display-text-item').classList.contains('completed'),
+                color: item.querySelector('.display-text-item').getAttribute('data-color')
             });
         });
         localStorage.setItem('todos', JSON.stringify(todos));
