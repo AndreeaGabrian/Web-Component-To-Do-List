@@ -53,6 +53,8 @@ You can use the ToDoList web component by including the JavaScript file and css 
     Note: Pay attention to the src path of the ToDoComponent. It should be reached according to where the html file is. Modify the path to fit your project structure.
 
 2. You could customize the appearance of the ToDoList component by modifying the `styles.css` file.
+3. You can modify the size of the component with `size` attribute:
+4. ```<to-do-list size="700px,600px"></to-do-list>```
 
 ## Implementation Details
 
